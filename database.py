@@ -21,7 +21,6 @@ if DATABASE_URL:
     # has the new psycopg (v3) package installed (importable as `psycopg`), prefer
     # the `postgresql+psycopg://` scheme so SQLAlchemy uses that driver instead
     # of trying to import psycopg2.
-    
     db_url = DATABASE_URL
     try:
         # prefer psycopg (v3) when available
@@ -29,8 +28,7 @@ if DATABASE_URL:
         if db_url.startswith("postgresql://") and "+psycopg" not in db_url:
             db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
     except Exception:
-        # psycopg not available; try psycopg2 (if installed) by making no change
-        pass
+        raise ImportError("psycopg (v3) is required for PostgreSQL connections. Please install psycopg>=3.x.")
     engine = create_engine(db_url, echo=False, future=True)
 else:
     # Fallback for local development - use SQLite file
