@@ -74,23 +74,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/api/MapList/{id}", response_model=List[MapListItem])
-def get_map_list(id: int, db: Session = Depends(get_db)):
-    maps = (
-        db.query(Map)
-        .filter(Map.memberid == id, Map.isdeleted != True)
-        .order_by(Map.createdate.desc())
-        .all()
-    )
-    return [
-        MapListItem(
-            mapid=m.mapid,
-            mapname=m.mapname,
-            memberid=m.memberid,
-            createdate=m.createdate
-        )
-        for m in maps
-    ]
+
 
 @app.get("/api/MapList/{id}", response_model=list[MapListItem])
 async def get_map_list(id: int, db: Session = Depends(get_db)):
