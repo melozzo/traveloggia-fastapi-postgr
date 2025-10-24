@@ -85,7 +85,7 @@ async def get_map_list(id: int, db: Session = Depends(get_db)):
         Map.memberid == id,
         Map.isdeleted != True
     ).order_by(Map.createdate.desc()).all()
-    return [MapListItem.from_orm(m) for m in maps]
+    return [MapListItem.model_validate(m) for m in maps]
 
 
 @app.post("/api/Members", response_model=MemberResponse, status_code=status.HTTP_201_CREATED)
@@ -103,7 +103,7 @@ async def create_member(member_req: MemberRequest, db: Session = Depends(get_db)
 
 @app.get("/api/Members/{id}", response_model=MemberResponse)
 async def get_member(id: int, db: Session = Depends(get_db)):
-    member = db.query(Member).filter(Member.id == id).first()
+    member = db.query(Member).filter(Member.memberid == id).first()
     if not member:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Member not found")
     return member
