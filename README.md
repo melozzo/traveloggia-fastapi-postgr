@@ -8,3 +8,7 @@ vercel hosting fastapi - python
 heroku hosting postresql - free
 amazon s3 hosting - images
 arvixe hosting legacy reactjs front end and sql db etc
+
+
+attempted to configure vercel new project with settings importing .env 
+now forcing a redeploy although I tried already I thought
