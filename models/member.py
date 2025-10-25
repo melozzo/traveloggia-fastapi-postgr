@@ -5,7 +5,7 @@ class Member(Base):
     __tablename__ = "members"
 
     # Adjust these columns based on your actual Members table structure
-    id = Column(Integer, primary_key=True, index=True)
+    memberid = Column(Integer, primary_key=True, index=True)
     email = Column(String(255), unique=True, index=True, nullable=False)
     password = Column(String(255), nullable=True)  # Added for authentication
     firstname = Column(String(100), nullable=True)

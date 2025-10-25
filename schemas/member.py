@@ -8,7 +8,7 @@ class MemberBase(BaseModel):
     lastname: Optional[str] = None
 
 class MemberResponse(MemberBase):
-    id: int
+    memberid: int
     model_config = {"from_attributes": True}
 
 class MemberRequest(BaseModel):
