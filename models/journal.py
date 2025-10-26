@@ -4,7 +4,7 @@ from database import Base
 from datetime import datetime
 
 class Journal(Base):
-    __tablename__ = "journals"
+    __tablename__ = "journal"
 
     # Primary key
     journalid = Column(Integer, primary_key=True, index=True)
@@ -13,11 +13,14 @@ class Journal(Base):
     siteid = Column(Integer, ForeignKey("sites.siteid"), nullable=False, index=True)
 
     # Journal properties
-    journaltitle = Column(String(500), nullable=True)
-    journaltext = Column(Text, nullable=True)
-    journaldate = Column(DateTime, default=datetime.now)
-    dateadded = Column(DateTime, default=datetime.now)
-    isdeleted = Column(Boolean, default=False)
+    text = Column(Text, nullable=True)
+    keywords = Column(String, nullable=True)
+    journaldate = Column(DateTime, nullable=True)
+    dateadded = Column(DateTime, nullable=True)
+    fromphone = Column(Boolean, nullable=True)
+    title = Column(String, nullable=True)
+    memberid = Column(Integer, nullable=True)
+    isdeleted = Column(Boolean, nullable=True)
 
     # Add other Journal columns based on your actual table structure:
     # memberid = Column(Integer, nullable=True)

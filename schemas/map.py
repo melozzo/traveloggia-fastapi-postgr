@@ -1,30 +1,11 @@
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
+from schemas.site import SiteResponse
 
-class SiteBase(BaseModel):
-    sitename: Optional[str] = None
-    routeindex: Optional[int] = None
-    arrival: Optional[datetime] = None
-    isdeleted: Optional[bool] = False
 
-class SiteResponse(SiteBase):
-    siteid: int
-    mapid: int
-    dateadded: Optional[datetime] = None
-    model_config = {"from_attributes": True}
 
-class SiteCreate(BaseModel):
-    mapid: int
-    sitename: Optional[str] = None
-    routeindex: Optional[int] = None
-    arrival: Optional[datetime] = None
 
-class SiteUpdate(BaseModel):
-    sitename: Optional[str] = None
-    routeindex: Optional[int] = None
-    arrival: Optional[datetime] = None
-    isdeleted: Optional[bool] = None
 
 class MapBase(BaseModel):
     mapname: Optional[str] = None
@@ -38,7 +19,7 @@ class MapResponse(MapBase):
     mapid: int
     createdate: Optional[datetime] = None
     lastrevision: Optional[datetime] = None
-    sites: List[SiteResponse] = []  # Include related sites
+    Sites: List[SiteResponse] = []  # Include related sites
     model_config = {"from_attributes": True}
 
 class MapListItem(BaseModel):

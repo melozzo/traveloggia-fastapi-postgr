@@ -3,10 +3,15 @@ from typing import Optional
 from datetime import datetime
 
 class JournalBase(BaseModel):
-    journaltitle: Optional[str] = None
-    journaltext: Optional[str] = None
+    text: Optional[str] = None
+    siteid: Optional[int] = None
+    keywords: Optional[str] = None
+    dateadded: Optional[datetime] = None
     journaldate: Optional[datetime] = None
-    isdeleted: Optional[bool] = False
+    fromphone: Optional[bool] = None
+    title: Optional[str] = None
+    memberid: Optional[int] = None
+    isdeleted: Optional[bool] = None
 
 class JournalResponse(JournalBase):
     journalid: int
