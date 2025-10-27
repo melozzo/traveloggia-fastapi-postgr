@@ -73,5 +73,5 @@ async def select_map(id: int, db: Session = Depends(get_db)):
         .all()
     )
     map_response = MapResponse.model_validate(selected_map, from_attributes=True)
-    map_response.sites = [SiteResponse.model_validate(site, from_attributes=True) for site in valid_sites]
+    map_response.Sites = [SiteResponse.model_validate(site, from_attributes=True) for site in valid_sites]
     return map_response
