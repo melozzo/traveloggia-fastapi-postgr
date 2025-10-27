@@ -10,7 +10,7 @@ from models.map import Map
 router = APIRouter()
 
 # ValidateMember endpoint: POST /api/Members/validate
-@router.post("/api/Members/validate", response_model=MemberResponse)
+@router.post("/api/Members/Validate", response_model=MemberResponse)
 async def validate_member(login: LoginRequest, db: Session = Depends(get_db)):
     # FastAPI handles CORS globally, so no need to set headers here
     member = db.query(Member).filter(Member.email == login.email).first()
