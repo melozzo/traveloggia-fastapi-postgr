@@ -1,14 +1,51 @@
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
 from models.map import Map
 from models.site import Site
-from schemas.map import MapListItem, MapResponse
+from schemas.map import MapListItem, MapResponse, MapCreate, MapUpdate
 from schemas.site import SiteResponse
 from datetime import datetime
 
 router = APIRouter()
+@router.put("/api/Maps/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def update_map(id: int, map_update: MapUpdate, db: Session = Depends(get_db)):
+    # Validate ID
+    map_obj = db.query(Map).filter(Map.mapid == id).first()
+    if not map_obj:
+        raise HTTPException(status_code=404, detail="Map not found")
+    if id <= 6088:
+        raise HTTPException(status_code=400, detail="ID must be greater than 6088")
+    # Update fields
+    for field, value in map_update.model_dump(exclude_unset=True).items():
+        setattr(map_obj, field, value)
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Error updating map")
+    return
+
+# POST: Create new map
+@router.post("/api/Maps", response_model=MapResponse, status_code=status.HTTP_201_CREATED)
+async def create_map(map_create: MapCreate, db: Session = Depends(get_db)):
+    new_map = Map(**map_create.model_dump())
+    new_map.createdate = datetime.now()
+    db.add(new_map)
+    db.commit()
+    db.refresh(new_map)
+    return MapResponse.model_validate(new_map, from_attributes=True)
+
+# DELETE: Soft delete map
+@router.delete("/api/Maps/{id}", response_model=MapResponse)
+async def delete_map(id: int, db: Session = Depends(get_db)):
+    map_obj = db.query(Map).filter(Map.mapid == id).first()
+    if not map_obj:
+        raise HTTPException(status_code=404, detail="Map not found")
+    map_obj.isdeleted = True
+    db.commit()
+    return MapResponse.model_validate(map_obj, from_attributes=True)
 
 # Returns the most recent map for a member, creates a default if none exists, and includes valid sites
 @router.get("/api/Maps/{id}", response_model=MapResponse)
