@@ -23,18 +23,31 @@ async def get_photo(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Photo not found")
     return PhotoResponse.model_validate(photo, from_attributes=True)
 
-# POST: api/Photos - create a new photo
+
+# POST: api/Photos - create a new photo with debugging
 @router.post("/api/Photos", response_model=PhotoResponse)
 async def post_photo(photo: PhotoCreate, db: Session = Depends(get_db)):
+    import logging
     from datetime import datetime
-    new_photo = Photo(**photo.model_dump())
-    new_photo.dateadded = datetime.now()
-    if new_photo.datetaken:
-        new_photo.datetaken = new_photo.datetaken.astimezone()
-    db.add(new_photo)
-    db.commit()
-    db.refresh(new_photo)
-    return PhotoResponse.model_validate(new_photo, from_attributes=True)
+    logging.basicConfig(level=logging.INFO)
+    try:
+        logging.info(f"Received photo data: {photo}")
+        new_photo = Photo(**photo.model_dump())
+        new_photo.dateadded = datetime.now()
+        if new_photo.datetaken:
+            logging.info(f"datetaken before conversion: {new_photo.datetaken}")
+            try:
+                new_photo.datetaken = new_photo.datetaken.astimezone()
+            except Exception as e:
+                logging.error(f"Error converting datetaken timezone: {e}")
+        db.add(new_photo)
+        db.commit()
+        db.refresh(new_photo)
+        logging.info(f"Photo created with ID: {new_photo.photoid}")
+        return PhotoResponse.model_validate(new_photo, from_attributes=True)
+    except Exception as e:
+        logging.error(f"Error in photo creation: {e}")
+        raise HTTPException(status_code=400, detail=f"Photo creation failed: {e}")
 
 # PUT: api/Photos/{id} - update a photo
 @router.put("/api/Photos/{id}", response_model=None)

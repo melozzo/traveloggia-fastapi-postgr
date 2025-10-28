@@ -35,6 +35,8 @@ class MapCreate(BaseModel):
     crowdsourced: Optional[bool] = False
     fromphone: Optional[bool] = False
     haslayers: Optional[bool] = False
+    class Config:
+        extra = "ignore"
 
 class MapUpdate(BaseModel):
     mapname: Optional[str] = None

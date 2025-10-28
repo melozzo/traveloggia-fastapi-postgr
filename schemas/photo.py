@@ -3,9 +3,6 @@ from typing import Optional
 from datetime import datetime
 
 class PhotoBase(BaseModel):
-    photoname: Optional[str] = None
-    photopath: Optional[str] = None
-    datetaken: Optional[datetime] = None
     filename: Optional[str] = None
     caption: Optional[str] = None
     siteid: Optional[int] = None
@@ -33,11 +30,8 @@ class PhotoResponse(PhotoBase):
     dateadded: Optional[datetime] = None
     model_config = {"from_attributes": True}
 
-class PhotoCreate(BaseModel):
+class PhotoCreate(PhotoBase):
     siteid: int
-    photoname: Optional[str] = None
-    photopath: Optional[str] = None
-    datetaken: Optional[datetime] = None
 
 class PhotoUpdate(BaseModel):
     photoname: Optional[str] = None

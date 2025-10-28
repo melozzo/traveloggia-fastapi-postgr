@@ -29,6 +29,9 @@ class SiteResponse(SiteBase):
 
 class SiteCreate(SiteBase):
     mapid: int
+    memberid: int
+    class Config:
+        extra = "ignore"
 
 class SiteUpdate(SiteBase):
     pass

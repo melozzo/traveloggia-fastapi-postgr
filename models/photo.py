@@ -16,7 +16,7 @@ class Photo(Base):
     dateadded = Column(DateTime, nullable=True)
     datetaken = Column(DateTime, nullable=True)
     fromphone = Column(Boolean, nullable=True)
-    storageurl = Column(String, nullable=True)
+    storageurl = Column(String, nullable=False)
     thumbnailurl = Column(String, nullable=True)
     orientation = Column(String, nullable=True)
     orientationid = Column(Integer, nullable=True)

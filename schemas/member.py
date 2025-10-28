@@ -15,6 +15,8 @@ class MemberResponse(MemberBase):
 class MemberRequest(BaseModel):
     email: str
     password: str
+    class Config:
+        extra = "ignore"
 
 class LoginRequest(BaseModel):
     email: str

@@ -30,7 +30,8 @@ async def get_journal(id: int, db: Session = Depends(get_db)):
 @router.post("/api/Journals", response_model=JournalResponse)
 async def post_journal(journal: JournalCreate, db: Session = Depends(get_db)):
     from datetime import datetime
-    new_journal = Journal(**journal.model_dump())
+    data = journal.model_dump(exclude_unset=True)
+    new_journal = Journal(**data)
     new_journal.dateadded = datetime.now()
     new_journal.journaldate = datetime.now()
     db.add(new_journal)

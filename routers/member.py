@@ -40,11 +40,12 @@ async def post_member(member_req: MemberRequest, db: Session = Depends(get_db)):
     member_already = db.query(Member).filter(Member.email == member_req.email).first()
     if member_already:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Member exists already")
-    # Create new member
+    data = member_req.model_dump(exclude_unset=True)
     new_member = Member(
-        email=member_req.email,
-        firstname=getattr(member_req, 'firstname', None),
-        lastname=getattr(member_req, 'lastname', None),
+        email=data.get('email'),
+        password=data.get('password'),
+        firstname=data.get('firstname'),
+        lastname=data.get('lastname'),
         accountcreatedate=datetime.now()
     )
     db.add(new_member)

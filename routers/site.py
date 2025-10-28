@@ -17,8 +17,28 @@ async def select_site(id: int, db: Session = Depends(get_db)):
 # POST: Create new site
 @router.post("/api/Sites", response_model=SiteResponse, status_code=status.HTTP_201_CREATED)
 async def create_site(site_create: SiteCreate, db: Session = Depends(get_db)):
-    new_site = Site(**site_create.model_dump())
-    new_site.dateadded = new_site.dateadded or None
+    from datetime import datetime
+    data = site_create.model_dump(exclude_unset=True)
+    # Validate required fields and types
+    if "mapid" not in data or "memberid" not in data:
+        raise HTTPException(status_code=422, detail="mapid and memberid are required")
+    try:
+        data["mapid"] = int(data["mapid"])
+        data["memberid"] = int(data["memberid"])
+    except Exception:
+        raise HTTPException(status_code=422, detail="mapid and memberid must be integers")
+    # Always set dateadded to current datetime if not valid or not provided
+    if "dateadded" in data:
+        if isinstance(data["dateadded"], str):
+            try:
+                data["dateadded"] = datetime.fromisoformat(data["dateadded"])
+            except Exception:
+                data["dateadded"] = datetime.now()
+        elif data["dateadded"] is None:
+            data["dateadded"] = datetime.now()
+    else:
+        data["dateadded"] = datetime.now()
+    new_site = Site(**data)
     db.add(new_site)
     db.commit()
     db.refresh(new_site)

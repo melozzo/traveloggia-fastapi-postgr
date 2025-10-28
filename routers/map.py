@@ -30,7 +30,9 @@ async def update_map(id: int, map_update: MapUpdate, db: Session = Depends(get_d
 # POST: Create new map
 @router.post("/api/Maps", response_model=MapResponse, status_code=status.HTTP_201_CREATED)
 async def create_map(map_create: MapCreate, db: Session = Depends(get_db)):
-    new_map = Map(**map_create.model_dump())
+    data = map_create.model_dump(exclude_unset=True)
+    from datetime import datetime
+    new_map = Map(**data)
     new_map.createdate = datetime.now()
     db.add(new_map)
     db.commit()

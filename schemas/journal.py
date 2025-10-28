@@ -24,6 +24,8 @@ class JournalCreate(BaseModel):
     journaltitle: Optional[str] = None
     journaltext: Optional[str] = None
     journaldate: Optional[datetime] = None
+    class Config:
+        extra = "ignore"
 
 class JournalUpdate(BaseModel):
     journaltitle: Optional[str] = None
