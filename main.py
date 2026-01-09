@@ -26,6 +26,7 @@ from routers.device import router as device_router
 from routers.journal import router as journal_router
 from routers.photo import router as photo_router
 from routers.site import router as site_router
+from routers.s3 import router as s3_router
 
 
 app = FastAPI(title="Traveloggia API", version="1.0.0")
@@ -67,5 +68,6 @@ app.include_router(device_router)
 app.include_router(journal_router)
 app.include_router(photo_router)
 app.include_router(site_router)
+app.include_router(s3_router)
 
 
