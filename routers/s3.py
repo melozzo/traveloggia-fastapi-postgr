@@ -8,14 +8,16 @@ from uuid import uuid4
 import boto3
 from botocore.exceptions import ClientError
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
-from database import get_db
-from models.photo import Photo
-from schemas.photo import PhotoResponse
 router = APIRouter()
 
 
+class S3UploadResponse(BaseModel):
+    success: bool
+    key: str
+    url: Optional[str] = None
+    filename: str
 
 
 def _bool_env(name: str, default: bool = False) -> bool:
@@ -110,16 +112,17 @@ def generate_presigned_get_url(key: str, expires: int = 3600) -> str:
     )
 
 
-@router.post("/api/s3/upload", response_model=PhotoResponse)
+@router.post("/api/s3/upload", response_model=S3UploadResponse)
 async def upload_photo(
-    siteid: int = Form(...),
-    caption: Optional[str] = Form(None),
     file: UploadFile = File(...),
-    db: Session = Depends(get_db),
 ):
-    allowed_types = {"image/jpeg", "image/png", "image/webp"}
+    """
+    Upload a file to S3 and return the key and URL.
+    The photo database record should be created separately using POST /api/Photos
+    """
+    allowed_types = {"image/jpeg", "image/png", "image/webp", "image/gif", "image/heic"}
     if file.content_type not in allowed_types:
-        raise HTTPException(status_code=400, detail="Unsupported content type")
+        raise HTTPException(status_code=400, detail=f"Unsupported content type: {file.content_type}")
 
     try:
         key, url = upload_fileobj_to_s3(
@@ -130,18 +133,9 @@ async def upload_photo(
     except ClientError as exc:
         raise HTTPException(status_code=500, detail=f"S3 upload failed: {exc}")
 
-    storage_value = url if url else key
-
-    new_photo = Photo(
-        siteid=siteid,
-        caption=caption,
-        filename=file.filename,
-        storageurl=storage_value,
-        dateadded=datetime.now(),
+    return S3UploadResponse(
+        success=True,
+        key=key,
+        url=url,
+        filename=file.filename or "upload"
     )
-
-    db.add(new_photo)
-    db.commit()
-    db.refresh(new_photo)
-
-    return PhotoResponse.model_validate(new_photo, from_attributes=True)
