@@ -50,7 +50,9 @@ def get_s3_client():
 
 def build_s3_key(filename: str) -> str:
     settings = get_s3_settings()
-    safe_name = (filename or "upload").replace(" ", "_")
+    if not filename:
+        raise ValueError("Filename cannot be empty")
+    safe_name = filename.replace(" ", "_")
     key = f"{uuid4()}-{safe_name}"
     return f"{settings['prefix']}/{key}" if settings["prefix"] else key
 
@@ -91,9 +93,12 @@ def upload_fileobj_to_s3(
 
     s3 = get_s3_client()
     try:
-        s3.upload_fileobj(file_obj, settings["bucket"], key, ExtraArgs=extra_args or None)
+        if extra_args:
+            s3.upload_fileobj(file_obj, settings["bucket"], key, ExtraArgs=extra_args)
+        else:
+            s3.upload_fileobj(file_obj, settings["bucket"], key)
     except ClientError as exc:
-        raise
+        raise RuntimeError(f"S3 upload failed: {exc}")
 
     url = build_object_url(key) if public_flag else None
     return key, url
@@ -124,18 +129,26 @@ async def upload_photo(
     if file.content_type not in allowed_types:
         raise HTTPException(status_code=400, detail=f"Unsupported content type: {file.content_type}")
 
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Filename is required")
+
+    # Ensure file pointer is at the beginning
+    file.file.seek(0)
+
     try:
         key, url = upload_fileobj_to_s3(
             file.file,
-            filename=file.filename or "upload",
+            filename=file.filename,
             content_type=file.content_type,
         )
-    except ClientError as exc:
-        raise HTTPException(status_code=500, detail=f"S3 upload failed: {exc}")
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Upload failed: {exc}")
 
     return S3UploadResponse(
         success=True,
         key=key,
         url=url,
-        filename=file.filename or "upload"
+        filename=file.filename or key.split('/')[-1]
     )
