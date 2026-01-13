@@ -110,7 +110,7 @@ def generate_presigned_get_url(key: str, expires: int = 3600) -> str:
     )
 
 
-@router.post("/api/Photos/upload", response_model=PhotoResponse)
+@router.post("/api/s3/upload", response_model=PhotoResponse)
 async def upload_photo(
     siteid: int = Form(...),
     caption: Optional[str] = Form(None),
