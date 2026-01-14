@@ -82,7 +82,7 @@ def build_object_url(key: str) -> Optional[str]:
     settings = get_s3_settings()
     if not (settings["bucket"] and settings["region"]):
         return None
-    return f"https://{settings['bucket']}.s3.{settings['region']}.amazonaws.com/{key}"
+    return f"https://s3-{settings['region']}.amazonaws.com/{settings['bucket']}/{key}"
 
 
 def upload_fileobj_to_s3(
@@ -113,7 +113,8 @@ def upload_fileobj_to_s3(
     
     logger.debug(f"Extra args for upload: {extra_args}")
 
-    public_flag = settings["public_read"] if acl_public_read is None else acl_public_read
+    # Always set public-read ACL for uploaded files
+    public_flag = True if acl_public_read is None else acl_public_read
     if public_flag:
         extra_args["ACL"] = "public-read"
     
