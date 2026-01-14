@@ -82,7 +82,7 @@ def build_object_url(key: str) -> Optional[str]:
     settings = get_s3_settings()
     if not (settings["bucket"] and settings["region"]):
         return None
-    return f"https://s3-{settings['region']}.amazonaws.com/{settings['bucket']}/{key}"
+    return f"https://{settings['bucket']}.s3.{settings['region']}.amazonaws.com/{key}"
 
 
 def upload_fileobj_to_s3(
@@ -111,9 +111,17 @@ def upload_fileobj_to_s3(
         if guessed:
             extra_args["ContentType"] = guessed
     
+    # Set ACL based on parameter or settings
+    if acl_public_read is None:
+        acl_public_read = settings["public_read"]
+    
+    if acl_public_read:
+        extra_args["ACL"] = "public-read"
+        logger.debug(f"Set ACL: public-read")
+    else:
+        logger.debug("ACL not set (private)")
+    
     logger.debug(f"Extra args for upload: {extra_args}")
-    extra_args["ACL"] = "public-read"
-    logger.debug(f"Set ACL: public-read")
     s3 = get_s3_client()
     try:
         logger.debug(f"Uploading to S3 bucket: {settings['bucket']}, key: {key}")
@@ -177,6 +185,7 @@ async def upload_photo(
             file.file,
             filename=file.filename,
             content_type=file.content_type,
+            acl_public_read=True,  # Make uploaded photos publicly visible
         )
         logger.info(f"Upload successful. Key: {key}, URL: {url}")
     except RuntimeError as exc:
