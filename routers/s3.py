@@ -111,16 +111,7 @@ def upload_fileobj_to_s3(
         if guessed:
             extra_args["ContentType"] = guessed
     
-    # Set ACL based on parameter or settings
-    if acl_public_read is None:
-        acl_public_read = settings["public_read"]
-    
-    if acl_public_read:
-        extra_args["ACL"] = "public-read"
-        logger.debug(f"Set ACL: public-read")
-    else:
-        logger.debug("ACL not set (private)")
-    
+    # Note: ACL parameter removed - bucket uses policy-based access control
     logger.debug(f"Extra args for upload: {extra_args}")
     s3 = get_s3_client()
     try:
