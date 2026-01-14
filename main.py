@@ -51,9 +51,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Create database tables (if they don't exist)
-# models.Base.metadata.create_all(bind=engine)
-
 
 @app.get("/", response_model=RootResponse)
 async def root():

@@ -134,7 +134,8 @@ def upload_fileobj_to_s3(
         logger.error(f"Unexpected error during S3 upload: {exc}", exc_info=True)
         raise RuntimeError(f"S3 upload failed: {exc}")
 
-    url = build_object_url(key) if public_flag else None
+    # Always generate URL for the uploaded object
+    url = build_object_url(key)
     logger.debug(f"Upload complete. URL: {url}")
     return key, url
 
