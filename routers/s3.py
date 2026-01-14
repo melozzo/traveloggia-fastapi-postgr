@@ -112,7 +112,8 @@ def upload_fileobj_to_s3(
             extra_args["ContentType"] = guessed
     
     logger.debug(f"Extra args for upload: {extra_args}")
-
+    extra_args["ACL"] = "public-read"
+    logger.debug(f"Set ACL: public-read")
     s3 = get_s3_client()
     try:
         logger.debug(f"Uploading to S3 bucket: {settings['bucket']}, key: {key}")
