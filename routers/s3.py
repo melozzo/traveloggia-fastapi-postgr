@@ -113,13 +113,6 @@ def upload_fileobj_to_s3(
     
     logger.debug(f"Extra args for upload: {extra_args}")
 
-    # Always set public-read ACL for uploaded files
-    public_flag = True if acl_public_read is None else acl_public_read
-    if public_flag:
-        extra_args["ACL"] = "public-read"
-    
-    logger.debug(f"Public flag: {public_flag}")
-
     s3 = get_s3_client()
     try:
         logger.debug(f"Uploading to S3 bucket: {settings['bucket']}, key: {key}")
