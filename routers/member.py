@@ -65,32 +65,10 @@ async def post_member(member_req: MemberRequest, db: Session = Depends(get_db)):
     return new_member
 
 
-@router.post("/api/Members", response_model=MemberResponse, status_code=status.HTTP_201_CREATED)
-async def create_member(member_req: MemberRequest, db: Session = Depends(get_db)):
-    existing = db.query(Member).filter(Member.email == member_req.email).first()
-    if existing:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Member with that email already exists")
-    new_member = Member(email=member_req.email, firstname=getattr(member_req, 'firstname', None), lastname=getattr(member_req, 'lastname', None))
-    db.add(new_member)
-    db.commit()
-    db.refresh(new_member)
-    return new_member
-
 @router.get("/api/Members/{id}", response_model=MemberResponse)
 async def get_member(id: int, db: Session = Depends(get_db)):
     member = db.query(Member).filter(Member.memberid == id).first()
     if not member:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Member not found")
     return member
-
-@router.post("/api/Members", response_model=MemberResponse, status_code=status.HTTP_201_CREATED)
-async def create_member(member_req: MemberRequest, db: Session = Depends(get_db)):
-    existing = db.query(Member).filter(Member.email == member_req.email).first()
-    if existing:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Member with that email already exists")
-    new_member = Member(email=member_req.email, firstname=getattr(member_req, 'firstname', None), lastname=getattr(member_req, 'lastname', None))
-    db.add(new_member)
-    db.commit()
-    db.refresh(new_member)
-    return new_member
 
