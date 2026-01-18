@@ -93,7 +93,7 @@ async def get_maps(id: int, db: Session = Depends(get_db)):
 async def get_map_list(id: int, db: Session = Depends(get_db)):
     maps = db.query(Map).filter(
         Map.memberid == id,
-        Map.isdeleted != True
+        Map.isdeleted == False
     ).order_by(Map.createdate.desc()).all()
     return [MapListItem.model_validate(m) for m in maps]
 
