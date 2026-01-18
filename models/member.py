@@ -10,6 +10,7 @@ class Member(Base):
     password = Column(String(255), nullable=True)  # Added for authentication
     firstname = Column(String(100), nullable=True)
     lastname = Column(String(100), nullable=True)
+    accountcreatedate = Column(DateTime, nullable=True)
 
     # Add other columns as needed from your .NET model:
     # createddate = Column(DateTime, nullable=True)
