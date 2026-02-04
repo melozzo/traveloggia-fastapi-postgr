@@ -108,7 +108,7 @@ async def select_map(id: int, db: Session = Depends(get_db)):
     valid_sites = (
         db.query(Site)
         .filter(Site.mapid == selected_map.mapid, Site.isdeleted != True)
-        .order_by(Site.routeindex, Site.arrival)
+        .order_by(Site.arrival.asc().nulls_last())
         .all()
     )
     map_response = MapResponse.model_validate(selected_map, from_attributes=True)
